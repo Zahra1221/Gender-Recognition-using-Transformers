@@ -6,4 +6,10 @@ We have built image and text-classification models for gender recognition using 
 
 For the PAN-18 dataset, the same vision models were used to build an image classification model. First, the ten different images of the users were combined, and for each user, ten new images were produced using the original images. The new images were fed into the transformer vision models to fine-tune them for gender classification. The code provided in "concatenate_images.py" regenerates the images used for each user. Then the gender recognition result of the ten newly generated images are combined useng two stacked feed-forward layers. For the text classification model, the same method and the same model explained for the Kaggle dataset was used. Eventually the image and text classification models were combined using stacked neural network layers.
 
-The code for building our model, and producing our result is available in this repository. 
+The code for building our model, and producing our result is available in this repository. For the Kaggle dataset, first hydrate the tweets. Then download this repository and place it beside the hydrated tweets file. Executing any of the files will build the corresponding model. For the PAN-18 dataset, download the dataset and unzip the file. download this repository and place it beside the dataset folder. Execute the "concatenate_images.py" file to produce the images. By executing the code for other models, the models will be built. 
+
+To execute the codes of this repository, the transformer and the PyTorch-Lightning packages need to be installed.
+
+  pip install -q transformers
+  
+  pip install transformers pytorch-lightning --quiet
