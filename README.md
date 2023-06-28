@@ -11,5 +11,4 @@ The code for building our model, and producing our result is available in this r
 To execute the codes of this repository, the transformer and the PyTorch-Lightning packages need to be installed.
 
     pip install -q transformers
-  
     pip install transformers pytorch-lightning --quiet
