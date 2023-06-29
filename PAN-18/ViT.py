@@ -347,6 +347,10 @@ model = Combine10ImageClassifier (dropout=0.5, hidden = 8)
 model = model.to (device)
 model.load_state_dict(torch.load('ViTModelCombiningImages'))
 
+train_loader = DataLoader (train_ds, batch_size=1, num_workers=2, shuffle=False)
+val_loader = DataLoader (val_ds, batch_size=1, num_workers=2, shuffle=False)
+test_loader = DataLoader (test_ds, batch_size=1, num_workers=2, shuffle=False)
+
 def TheImageCombinedModel (model, dataloader, device):
   model = model.eval()
   out = []
