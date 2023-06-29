@@ -148,7 +148,7 @@ imgModel.load_state_dict(torch.load('ViTModel1'))
 
 # We want images to be in order in train, here. We don't want shuffle
 train_loader = DataLoader(train, batch_size=10, collate_fn=ImageClassificationCollator(feature_extractor), num_workers=2, shuffle=False) 
-val_loader = DataLoader(val, batch_size=10, collate_fn=ImageClassificationCollator(feature_extractor), num_workers=2, shuffle=False)
+val_loader = DataLoader(validation, batch_size=10, collate_fn=ImageClassificationCollator(feature_extractor), num_workers=2, shuffle=False)
 test_loader = DataLoader(test, batch_size=10, collate_fn=ImageClassificationCollator(feature_extractor), num_workers=2, shuffle=False)
 
 def TransformerModel (model, dataloader, device):
