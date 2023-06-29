@@ -191,7 +191,7 @@ d0 = [x[0] for sub in test_concat for x in sub]
 d1 = [x[1] for sub in test_concat for x in sub]
 d2 = [x for x in test_labels for q in range(0, 10)] # Batch Size was 10
 df2 = pd.DataFrame(data={'data0':d0, 'data1':d1, 'labels':d2})
-df2.to_csv ('LeViT_val_combine.csv', index=False, encoding='utf-8')
+df2.to_csv ('LeViT_test_combine.csv', index=False, encoding='utf-8')
 
 # Combining images starts from here.
 train_ds = []
