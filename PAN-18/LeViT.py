@@ -4,7 +4,7 @@ from huggingface_hub import HfApi, Repository
 from torch.utils.data import DataLoader, Dataset
 from torchmetrics import Accuracy
 from torchvision.datasets import ImageFolder
-from transformers import ViTFeatureExtractor, ViTForImageClassification
+from transformers import LevitFeatureExtractor, LevitForImageClassification
 from torch.utils.data import DataLoader, Dataset
 from torchvision.datasets import ImageFolder
 import torch.nn as nn
