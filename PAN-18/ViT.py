@@ -186,7 +186,7 @@ d0 = [x[0] for sub in val_concat for x in sub]
 d1 = [x[1] for sub in val_concat for x in sub]
 d2 = [x for x in val_labels for q in range(0, 10)] # Batch Size was 10
 df1 = pd.DataFrame(data={'data0':d0, 'data1':d1, 'labels':d2})
-df1.to_csv ('ViT_validation_combine.csv', index=False, encoding='utf-8')
+df1.to_csv ('ViT_val_combine.csv', index=False, encoding='utf-8')
 d0 = [x[0] for sub in test_concat for x in sub]
 d1 = [x[1] for sub in test_concat for x in sub]
 d2 = [x for x in test_labels for q in range(0, 10)] # Batch Size was 10
