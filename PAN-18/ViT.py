@@ -382,6 +382,8 @@ target_names = ['Female', 'Male']
 print(classification_report(A, P, target_names=target_names))
 
 train_loader = DataLoader (train_ds, batch_size=16, num_workers=2, shuffle=False) #no shuffles
+val_loader = DataLoader (val_ds, batch_size=16, num_workers=2, shuffle=False) #no shuffles
+test_loader = DataLoader (test_ds, batch_size=16, num_workers=2, shuffle=False) #no shuffles
 
 def TheImageCombinedModel (model, dataloader, device):
   model = model.eval()
