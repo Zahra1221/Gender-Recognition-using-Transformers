@@ -12,3 +12,5 @@ To execute the codes of this repository, the transformer and the PyTorch-Lightni
 
     pip install -q transformers
     pip install transformers pytorch-lightning --quiet
+
+The code is also available in [this colab notebook](https://colab.research.google.com/drive/1e4YCl5qv-siLN2csaPpQdwn9gqgjGbCn).
