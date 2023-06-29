@@ -15,7 +15,6 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Adam
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, TensorDataset
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
-
 import math
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -240,6 +239,19 @@ test_ds = TensorDataset (torch.stack(test_ds), torch.tensor (test_lbl))
 train_loader = DataLoader (train_ds, batch_size=16, num_workers=2, shuffle=True)
 test_loader = DataLoader (test_ds, batch_size=16, num_workers=2, shuffle=False)
 val_loader = DataLoader (val_ds, batch_size=16, num_workers=2, shuffle=False)
+
+# Model for Combining the 10 images
+class Combine10ImageClassifier (nn.Module):
+  def __init__ (self, dropout, hidden, input_size=20, classes=2):
+    super (Combine10ImageClassifier, self).__init__()
+    self.dropout = nn.Dropout (p= dropout)
+    self.regressor1 = nn.Linear (input_size, hidden)
+    self.regressor2 = nn.Linear (hidden, classes)
+  def forward (self, input):
+    output = self.dropout (input)
+    output = self.regressor1 (output)
+    output = self.regressor2 (output)
+    return output
 
 model = Combine10ImageClassifier (dropout=0.5, hidden = 8)
 model = model.to (device)
