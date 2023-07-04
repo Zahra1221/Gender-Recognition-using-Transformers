@@ -33,7 +33,6 @@ import seaborn as sns
 
 # Specifying GPU if there are any
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-device
 
 path = os.getcwd()
 parent = os.path.abspath(os.path.join(path, os.pardir))
