@@ -715,12 +715,11 @@ os.remove(path+'/bert_test_output.csv')
 CM = confusion_matrix(A, P)
 CM = CM / len (P)
 CM = pd.DataFrame(CM, index=['Female','Male'], columns=['Female','Male'])
-
 plt.figure(figsize = (3,3))
 sns.heatmap(CM, annot=True)
 plt.xlabel("Predicted Values", fontsize = 11)
 plt.ylabel("True Values", fontsize = 11)
-
+plt.show()
 target_names = ['Female', 'Male']
 print(classification_report(A, P, target_names=target_names))
 
