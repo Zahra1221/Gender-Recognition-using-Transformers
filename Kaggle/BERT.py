@@ -259,7 +259,7 @@ test_data = TensorDataset (test_seq, test_mask, test_y, ids2)
 test_sampler = SequentialSampler (test_data)
 test_dataloader = DataLoader (test_data, sampler=test_sampler, batch_size=batch_size)
 
-classes = 2
+classes = 3
 class BertGenderClassifier (nn.Module):
   def __init__ (self, bert, classes):
     super (BertGenderClassifier, self).__init__()
@@ -276,10 +276,6 @@ class BertGenderClassifier (nn.Module):
 model = BertGenderClassifier (bert, classes)
 model = model.to (device)
 
-plt.bar (['Female', 'Male'], [train_y.tolist().count(0), train_y.tolist().count(1)])
-plt.bar (['Female', 'Male'], [val_y.tolist().count(0), val_y.tolist().count(1)])
-plt.bar (['Female', 'Male'], [test_y.tolist().count(0), test_y.tolist().count(1)])
-
 epochs = 8 #20
 optimizer = AdamW (model.parameters(), lr=2e-5)
 total_steps = len(train_dataloader) * epochs
@@ -291,6 +287,8 @@ def train_epochs (model, dataloader, ce_loss, optimizer, device, scheduler, entr
   model = model.train ()
   losses = []
   correct_predictions_count = 0
+  B_correct = 0
+  B_incorrect = 0
   F_correct = 0
   F_incorrect = 0
   M_correct = 0
@@ -309,16 +307,20 @@ def train_epochs (model, dataloader, ce_loss, optimizer, device, scheduler, entr
     optimizer.step()
     scheduler.step()
     optimizer.zero_grad()
+    B_correct += torch.sum ((preds == 0) & (preds == targets))
+    B_incorrect += torch.sum ((preds == 0) & (preds != targets))
     F_correct += torch.sum ((preds == 0) & (preds == targets))
     F_incorrect += torch.sum ((preds == 0) & (preds != targets))
     M_correct += torch.sum ((preds == 1) & (preds == targets))
     M_incorrect += torch.sum ((preds == 1) & (preds != targets))
-  return correct_predictions_count.double() / entry_size, np.mean(losses), F_correct / (F_correct + F_incorrect), M_correct / (M_correct + M_incorrect), F_correct / (F_correct + M_incorrect), M_correct / (M_correct + F_incorrect) 
+  return correct_predictions_count.double() / entry_size, np.mean(losses), B_correct / (B_correct + B_incorrect), F_correct / (F_correct + F_incorrect), M_correct / (M_correct + M_incorrect), B_correct / (B_correct + F_incorrect + M_incorrect), F_correct / (F_correct + B_incorrect + M_incorrect), M_correct / (M_correct + B_incorrect + F_incorrect)
 
 def eval_model (model, dataloader, ce_loss, device, entry_size):
   model = model.eval()
   losses = []
   correct_predictions_count = 0
+  B_correct = 0
+  B_incorrect = 0
   F_correct = 0
   F_incorrect = 0
   M_correct = 0
@@ -334,11 +336,13 @@ def eval_model (model, dataloader, ce_loss, device, entry_size):
       l = len (targets[:])
       correct_predictions_count += torch.sum (preds == targets)
       losses.append (loss.item())
+      B_correct += torch.sum ((preds == 0) & (preds == targets))
+      B_incorrect += torch.sum ((preds == 0) & (preds != targets))
       F_correct += torch.sum ((preds == 0) & (preds == targets))
       F_incorrect += torch.sum ((preds == 0) & (preds != targets))
       M_correct += torch.sum ((preds == 1) & (preds == targets))
       M_incorrect += torch.sum ((preds == 1) & (preds != targets))
-  return correct_predictions_count.double() / entry_size, np.mean(losses), F_correct / (F_correct + F_incorrect), M_correct / (M_correct + M_incorrect), F_correct / (F_correct + M_incorrect), M_correct / (M_correct + F_incorrect)
+  return correct_predictions_count.double() / entry_size, np.mean(losses), B_correct / (B_correct + B_incorrect), F_correct / (F_correct + F_incorrect), M_correct / (M_correct + M_incorrect), B_correct / (B_correct + F_incorrect + M_incorrect), F_correct / (F_correct + B_incorrect + M_incorrect), M_correct / (M_correct + B_incorrect + F_incorrect)
 
 torch.cuda.empty_cache()
 # For saving the history
@@ -347,10 +351,10 @@ best_accuracy = 0
 for epoch in range (epochs):
   print(f'Epoch {epoch + 1}/{epochs}')
   print('-' * 10)
-  train_acc, train_loss, train_F_Percision, train_M_Percision, train_F_Recall, train_M_Recall = train_epochs (model, train_dataloader, ce_loss, optimizer, device, scheduler, len(train_data) )
-  print(f'Train loss {train_loss} accuracy {train_acc} Female Percision {train_F_Percision} Male Percision {train_M_Percision} Female Recall {train_F_Recall} Male Recall {train_M_Recall}')
-  val_acc, val_loss, val_F_Percision, val_M_Percision, val_F_Recall, val_M_Recall = eval_model(model, val_dataloader, ce_loss, device, len(val_data) )
-  print(f'Val loss {val_loss} accuracy {val_acc} Female Percision {val_F_Percision} Male Percision {val_M_Percision} Female Recall {val_F_Recall} Male Recall {val_M_Recall}')
+  train_acc, train_loss, train_B_Percision, train_F_Percision, train_M_Percision, train_B_Recall, train_F_Recall, train_M_Recall = train_epochs (model, train_dataloader, ce_loss, optimizer, device, scheduler, len(train_data) )
+  print(f'Train loss {train_loss} accuracy {train_acc} Brand Percision {train_B_Percision} Female Percision {train_F_Percision} Male Percision {train_M_Percision} Brand Recall {train_B_Recall} Female Recall {train_F_Recall} Male Recall {train_M_Recall}')
+  val_acc, val_loss, val_B_Percision, val_F_Percision, val_M_Percision, val_B_Recall, val_F_Recall, val_M_Recall = eval_model(model, val_dataloader, ce_loss, device, len(val_data) )
+  print(f'Val loss {val_loss} accuracy {val_acc} Brand Percision {val_B_Percision} Female Percision {val_F_Percision} Male Percision {val_M_Percision} Brand Recall {val_B_Recall} Female Recall {val_F_Recall} Male Recall {val_M_Recall}')
   print()
   history['train_acc'].append(train_acc)
   history['train_loss'].append(train_loss)
@@ -399,7 +403,15 @@ train_seq1 = [x for k in list(id2tokens_train1.keys()) for x in id2tokens_train1
 train_seq1 = torch.tensor (train_seq1)
 train_mask1 = [x for k in list(id2tokens_train1.keys()) for x in id2tokens_train1[k]['attention_mask']]
 train_mask1 = torch.tensor (train_mask1)
-train_y1 = [0 if id2gender_train[k] == 'F' else 1 for k in list(id2tokens_train1.keys()) for i in range(0, 10)]
+train_y1 = []
+for k in list(id2tokens_train1.keys()):
+  for i in range(0, 10):
+    if id2gender_train1[k] == 'B':
+      train_y1.append(0)
+    elif id2gender_train1[k] == 'F':
+      train_y1.append(1)
+    else:
+      train_y1.append(2)
 train_y1 = torch.tensor (train_y1)
 
 ids2 = [x for x in range(0, len(id2tokens_train2)) for i in range(0, 10)]
@@ -408,7 +420,15 @@ train_seq2 = [x for k in list(id2tokens_train2.keys()) for x in id2tokens_train2
 train_seq2 = torch.tensor (train_seq2)
 train_mask2 = [x for k in list(id2tokens_train2.keys()) for x in id2tokens_train2[k]['attention_mask']]
 train_mask2 = torch.tensor (train_mask2)
-train_y2 = [0 if id2gender_train[k] == 'F' else 1 for k in list(id2tokens_train2.keys()) for i in range(0, 10)]
+train_y2 = []
+for k in list(id2tokens_train2.keys()):
+  for i in range(0, 10):
+    if id2gender_train2[k] == 'B':
+      train_y2.append(0)
+    elif id2gender_train2[k] == 'F':
+      train_y2.append(1)
+    else:
+      train_y2.append(2)
 train_y2 = torch.tensor (train_y2)
 
 batch_size = 8
@@ -434,36 +454,40 @@ def TheBERTModel (model, dataloader, device):
 torch.cuda.empty_cache()
 bert_train_out1, bert_train_labels1 = TheBERTModel (model, train_dataloader1, device)
 
+b = []
 f = []
 m = []
 l = len (bert_train_out1)
 for i in range (0, l):
   for j in range (0, 8):
-    f.append(bert_train_out1[i][j][0])
-    m.append(bert_train_out1[i][j][1])
+    b.append(bert_train_out1[i][j][0])
+    f.append(bert_train_out1[i][j][1])
+    m.append(bert_train_out1[i][j][2])
 
 labels = []
 for item in train_data1:
   labels.append (item[2].item())
 
-df = pd.DataFrame (data={'F':f, 'M':m, 'labels':labels})
+df = pd.DataFrame (data={'B':b, 'F':f, 'M':m, 'labels':labels})
 df.to_csv (path+'/bert_train_output1.csv')
 
 bert_train_out2, bert_train_labels2 = TheBERTModel (model, train_dataloader2, device)
 
+b = []
 f = []
 m = []
 l = len (bert_train_out2)
 for i in range (0, l):
   for j in range (0, 8):
-    f.append(bert_train_out2[i][j][0])
-    m.append(bert_train_out2[i][j][1])
+    b.append(bert_train_out2[i][j][0])
+    f.append(bert_train_out2[i][j][1])
+    m.append(bert_train_out2[i][j][2])
 
 labels = []
 for item in train_data2:
   labels.append (item[2].item())
 
-df = pd.DataFrame (data={'F':f, 'M':m, 'labels':labels})
+df = pd.DataFrame (data={'B':b, 'F':f, 'M':m, 'labels':labels})
 df.to_csv (path+'/bert_train_output2.csv')
 
 batch_size = 8
@@ -473,19 +497,21 @@ val_dataloader = DataLoader (val_data, batch_size=batch_size)
 
 bert_val_out, bert_val_labels = TheBERTModel (model, val_dataloader, device)
 
+b = []
 f = []
 m = []
 l = len (bert_val_out)
 for i in range (0, l):
   for j in range (0, 8):
-    f.append(bert_val_out[i][j][0])
-    m.append(bert_val_out[i][j][1])
+    b.append(bert_val_out[i][j][0])
+    f.append(bert_val_out[i][j][1])
+    m.append(bert_val_out[i][j][2])
 
 labels = []
 for item in val_data:
   labels.append (item[2].item())
 
-df = pd.DataFrame (data={'F':f, 'M':m, 'labels':labels})
+df = pd.DataFrame (data={'B':b, 'F':f, 'M':m, 'labels':labels})
 df.to_csv (path+'/bert_val_output.csv')
 
 batch_size = 8
@@ -495,19 +521,21 @@ test_dataloader = DataLoader (test_data, batch_size=batch_size)
 
 bert_test_out, bert_test_labels = TheBERTModel (model, test_dataloader, device)
 
+b = []
 f = []
 m = []
 l = len (bert_test_out)
 for i in range (0, l):
   for j in range (0, 8):
-    f.append(bert_test_out[i][j][0])
-    m.append(bert_test_out[i][j][1])
+    b.append(bert_test_out[i][j][0])
+    f.append(bert_test_out[i][j][1])
+    m.append(bert_test_out[i][j][2])
 
 labels = []
 for item in test_data:
   labels.append (item[2].item())
 
-df = pd.DataFrame (data={'F':f, 'M':m, 'labels':labels})
+df = pd.DataFrame (data={'B':b, 'F':f, 'M':m, 'labels':labels})
 df.to_csv (path+'/bert_test_output.csv')
 
 df0 = pd.read_csv (path+'/bert_train_output1.csv')
@@ -527,6 +555,7 @@ for i in df.index:
     train_output.append (torch.tensor (dummy))
     train_label.append (df['labels'][i-1])
     dummy = []
+  dummy.append (df['B'][i])
   dummy.append (df['F'][i])
   dummy.append (df['M'][i])
 train_output.append (torch.tensor (dummy))
@@ -539,6 +568,7 @@ for i in df2.index:
     val_output.append (torch.tensor (dummy))
     val_label.append (df2['labels'][i-1])
     dummy = []
+  dummy.append (df2['B'][i])
   dummy.append (df2['F'][i])
   dummy.append (df2['M'][i])
 val_output.append (torch.tensor (dummy))
@@ -551,6 +581,7 @@ for i in df3.index:
     test_output.append (torch.tensor (dummy))
     test_label.append (df3['labels'][i-1])
     dummy = []
+  dummy.append (df3['B'][i])
   dummy.append (df3['F'][i])
   dummy.append (df3['M'][i])
 test_output.append (torch.tensor (dummy))
@@ -590,6 +621,8 @@ def train_epochs (model, dataloader, ce_loss, optimizer, device, scheduler, entr
   model = model.train ()
   losses = []
   correct_predictions_count = 0
+  B_correct = 0
+  B_incorrect = 0
   F_correct = 0
   F_incorrect = 0
   M_correct = 0
@@ -602,6 +635,8 @@ def train_epochs (model, dataloader, ce_loss, optimizer, device, scheduler, entr
       loss = ce_loss (outputs, targets)
       correct_predictions_count += torch.sum (preds == targets)
       losses.append (loss.item())
+      B_correct += torch.sum ((preds == 0) & (preds == targets))
+      B_incorrect += torch.sum ((preds == 0) & (preds != targets))
       F_correct += torch.sum ((preds == 0) & (preds == targets))
       F_incorrect += torch.sum ((preds == 0) & (preds != targets))
       M_correct += torch.sum ((preds == 1) & (preds == targets))
@@ -611,12 +646,14 @@ def train_epochs (model, dataloader, ce_loss, optimizer, device, scheduler, entr
       optimizer.step()
       scheduler.step()
       optimizer.zero_grad()
-  return correct_predictions_count.double() / entry_size, np.mean(losses), F_correct / (F_correct + F_incorrect), M_correct / (M_correct + M_incorrect), F_correct / (F_correct + M_incorrect), M_correct / (M_correct + F_incorrect) 
+  return correct_predictions_count.double() / entry_size, np.mean(losses), B_correct / (B_correct + B_incorrect), F_correct / (F_correct + F_incorrect), M_correct / (M_correct + M_incorrect), B_correct / (B_correct + F_incorrect + M_incorrect), F_correct / (F_correct + B_incorrect + M_incorrect), M_correct / (M_correct + B_incorrect + F_incorrect)
 
 def eval_model (model, dataloader, ce_loss, device, entry_size):
   model = model.eval()
   losses = []
   correct_predictions_count = 0
+  B_correct = 0
+  B_incorrect = 0
   F_correct = 0
   F_incorrect = 0
   M_correct = 0
@@ -631,11 +668,13 @@ def eval_model (model, dataloader, ce_loss, device, entry_size):
       l = len (targets[:])
       correct_predictions_count += torch.sum (preds == targets)
       losses.append (loss.item())
+      B_correct += torch.sum ((preds == 0) & (preds == targets))
+      B_incorrect += torch.sum ((preds == 0) & (preds != targets))
       F_correct += torch.sum ((preds == 0) & (preds == targets))
       F_incorrect += torch.sum ((preds == 0) & (preds != targets))
       M_correct += torch.sum ((preds == 1) & (preds == targets))
       M_incorrect += torch.sum ((preds == 1) & (preds != targets))
-  return correct_predictions_count.double() / entry_size, np.mean(losses), F_correct / (F_correct + F_incorrect), M_correct / (M_correct + M_incorrect), F_correct / (F_correct + M_incorrect), M_correct / (M_correct + F_incorrect)
+  return correct_predictions_count.double() / entry_size, np.mean(losses), B_correct / (B_correct + B_incorrect), F_correct / (F_correct + F_incorrect), M_correct / (M_correct + M_incorrect), B_correct / (B_correct + F_incorrect + M_incorrect), F_correct / (F_correct + B_incorrect + M_incorrect), M_correct / (M_correct + B_incorrect + F_incorrect)
 
 torch.cuda.empty_cache()
 # For saving the history
@@ -644,23 +683,15 @@ best_accuracy = 0
 for epoch in range (epochs):
   print(f'Epoch {epoch + 1}/{epochs}')
   print('-' * 10)
-  train_acc, train_loss, train_F_Percision, train_M_Percision, train_F_Recall, train_M_Recall = train_epochs (model, train_loader, ce_loss, optimizer, device, scheduler, len(train_ds) )
-  print(f'Train loss {train_loss} accuracy {train_acc} Female Percision {train_F_Percision} Male Percision {train_M_Percision} Female Recall {train_F_Recall} Male Recall {train_M_Recall}')
-  val_acc, val_loss, val_F_Percision, val_M_Percision, val_F_Recall, val_M_Recall = eval_model(model, val_loader, ce_loss, device, len(val_ds) )
-  print(f'Val loss {val_loss} accuracy {val_acc} Female Percision {val_F_Percision} Male Percision {val_M_Percision} Female Recall {val_F_Recall} Male Recall {val_M_Recall}')
+  train_acc, train_loss, train_B_Percision, train_F_Percision, train_M_Percision, train_B_Recall, train_F_Recall, train_M_Recall = train_epochs (model, train_loader, ce_loss, optimizer, device, scheduler, len(train_ds) )
+  print(f'Train loss {train_loss} accuracy {train_acc} Brand Percision {train_B_Percision} Female Percision {train_F_Percision} Male Percision {train_M_Percision} Brand Recall {train_B_Recall} Female Recall {train_F_Recall} Male Recall {train_M_Recall}')
+  val_acc, val_loss, val_B_Percision, val_F_Percision, val_M_Percision, val_B_Recall, val_F_Recall, val_M_Recall = eval_model(model, val_loader, ce_loss, device, len(val_ds) )
+  print(f'Val loss {val_loss} accuracy {val_acc} Brand Percision {val_B_Percision} Female Percision {val_F_Percision} Male Percision {val_M_Percision} Brand Recall {val_B_Recall} Female Recall {val_F_Recall} Male Recall {val_M_Recall}')
   print()
   history['train_acc'].append(train_acc)
   history['train_loss'].append(train_loss)
-  history['train_F_Percision'].append (train_F_Percision)
-  history['train_M_Percision'].append (train_M_Percision)
-  history['train_F_Recall'].append (train_F_Recall)
-  history['train_M_Recall'].append (train_M_Recall)
   history['val_acc'].append(val_acc)
   history['val_loss'].append(val_loss)
-  history['val_F_Percision'].append (val_F_Percision)
-  history['val_M_Percision'].append (val_M_Percision)
-  history['val_F_Recall'].append (val_F_Recall)
-  history['val_M_Recall'].append (val_M_Recall)
   if val_acc > best_accuracy:
     torch.save(model.state_dict(), 'ModelCombiningTexts_BERT')
     best_accuracy = val_acc
@@ -718,13 +749,13 @@ os.remove(path+'/bert_test_output.csv')
 
 CM = confusion_matrix(A, P)
 CM = CM / len (P)
-CM = pd.DataFrame(CM, index=['Female','Male'], columns=['Female','Male'])
+CM = pd.DataFrame(CM, index=['Brand', 'Female','Male'], columns=['Female','Male'])
 plt.figure(figsize = (3,3))
 sns.heatmap(CM, annot=True)
 plt.xlabel("Predicted Values", fontsize = 11)
 plt.ylabel("True Values", fontsize = 11)
 plt.show()
-target_names = ['Female', 'Male']
+target_names = ['Brand', 'Female', 'Male']
 print(classification_report(A, P, target_names=target_names))
 
 
