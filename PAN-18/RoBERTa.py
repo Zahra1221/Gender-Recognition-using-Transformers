@@ -608,7 +608,7 @@ model = TextCombination (5, 0.1)
 model = model.to (device)
 
 epochs = 1000
-optimizer = AdamW (model.parameters(), lr=0.01)
+optimizer = torch.optim.adam (model.parameters(), lr=0.01)
 total_steps = len(test_loader) * epochs
 scheduler = get_linear_schedule_with_warmup (optimizer, num_warmup_steps=0, num_training_steps=total_steps)
 ce_loss = nn.CrossEntropyLoss().to (device)
@@ -753,7 +753,3 @@ plt.ylabel("True Values", fontsize = 11)
 plt.show()
 target_names = ['Female', 'Male']
 print(classification_report(A, P, target_names=target_names))
-
-
-
-
