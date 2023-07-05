@@ -766,7 +766,7 @@ d0 = [x[0] for sub in test_combine for x in sub]
 d1 = [x[1] for sub in test_combine for x in sub]
 d2 = [x[2] for sub in test_combine for x in sub]
 d3 = [x for x in A]
-df = pd.DataFrame(data={'data0':d0, 'data1':d1, 'data2':d2, 'labels':d2})
+df = pd.DataFrame(data={'data0':d0, 'data1':d1, 'data2':d2, 'labels':d3})
 df.to_csv (path+'/test_text_combined_BERT.csv', index=False, encoding='utf-8')
 
 os.remove(path+'/bert_train_output1.csv')
