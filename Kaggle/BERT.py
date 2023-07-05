@@ -224,7 +224,15 @@ train_seq = [x for k in list(id2tokens_train.keys()) for x in id2tokens_train[k]
 train_seq = torch.tensor (train_seq)
 train_mask = [x for k in list(id2tokens_train.keys()) for x in id2tokens_train[k]['attention_mask']]
 train_mask = torch.tensor (train_mask)
-train_y = [0 if id2gender_train[k] == 'F' else 1 for k in list(id2tokens_train.keys()) for i in range(0, 10)]
+train_y = []
+for k in list(id2tokens_train.keys()):
+  for i in range(10):
+    if id2gender_train[k] == 'B':
+      train_y.append (0)
+    elif id2gender_train[k] == 'F': 
+      train_y.append (1)
+    else:
+      train_y.append (2)
 train_y = torch.tensor (train_y)
 
 ids = [x for x in range(0, len(id2tokens_val)) for i in range(0, 10)]
@@ -233,7 +241,15 @@ val_seq = [x for k in list(id2tokens_val.keys()) for x in id2tokens_val[k]['inpu
 val_seq = torch.tensor (val_seq)
 val_mask = [x for k in list(id2tokens_val.keys()) for x in id2tokens_val[k]['attention_mask']]
 val_mask = torch.tensor (val_mask)
-val_y = [0 if id2gender_val[k] == 'F' else 1 for k in list(id2tokens_val.keys()) for i in range(0, 10)]
+val_y = []
+for k in list(id2tokens_val.keys()):
+  for i in range(10):
+    if id2gender_val[k] == 'B':
+      train_y.append (0)
+    elif id2gender_val[k] == 'F': 
+      val_y.append (1)
+    else:
+      val_y.append (2)
 val_y = torch.tensor (val_y)
 
 ids2 = [x for x in range(0, len(id2tokens_test)) for i in range(0, 10)]
@@ -242,7 +258,15 @@ test_seq = [x for k in list(id2tokens_test.keys()) for x in id2tokens_test[k]['i
 test_seq = torch.tensor (test_seq)
 test_mask = [x for k in list(id2tokens_test.keys()) for x in id2tokens_test[k]['attention_mask']]
 test_mask = torch.tensor (test_mask)
-test_y = [0 if id2gender_test[k] == 'F' else 1 for k in list(id2tokens_test.keys()) for i in range(0, 10)]
+test_y = []
+for k in list(id2tokens_test.keys()):
+  for i in range(10):
+    if id2gender_test[k] == 'B':
+      test_y.append (0)
+    elif id2gender_test[k] == 'F': 
+      test_y.append (1)
+    else:
+      test_y.append (2)
 test_y = torch.tensor (test_y)
 
 batch_size = 32
@@ -728,18 +752,21 @@ test_combine, test_combine_labels, A, P = TheTextCombinedModel (model, test_load
 
 d0 = [x[0] for sub in train_combine for x in sub]
 d1 = [x[1] for sub in train_combine for x in sub]
-d2 = [x for x in A1]
-df = pd.DataFrame(data={'data0':d0, 'data1':d1, 'labels':d2})
+d2 = [x[2] for sub in train_combine for x in sub]
+d3 = [x for x in A1]
+df = pd.DataFrame(data={'data0':d0, 'data1':d1, 'data2':d2 'labels':d3})
 df.to_csv (path+'/train_text_combined_BERT.csv', index=False, encoding='utf-8')
 d0 = [x[0] for sub in val_combine for x in sub]
 d1 = [x[1] for sub in val_combine for x in sub]
-d2 = [x for x in A2]
-df = pd.DataFrame(data={'data0':d0, 'data1':d1, 'labels':d2})
+d2 = [x[2] for sub in val_combine for x in sub]
+d3 = [x for x in A2]
+df = pd.DataFrame(data={'data0':d0, 'data1':d1, 'data2':d2, 'labels':d3})
 df.to_csv (path+'/val_text_combined_BERT.csv', index=False, encoding='utf-8')
 d0 = [x[0] for sub in test_combine for x in sub]
 d1 = [x[1] for sub in test_combine for x in sub]
-d2 = [x for x in A]
-df = pd.DataFrame(data={'data0':d0, 'data1':d1, 'labels':d2})
+d2 = [x[2] for sub in test_combine for x in sub]
+d3 = [x for x in A]
+df = pd.DataFrame(data={'data0':d0, 'data1':d1, 'data2':d2, 'labels':d2})
 df.to_csv (path+'/test_text_combined_BERT.csv', index=False, encoding='utf-8')
 
 os.remove(path+'/bert_train_output1.csv')
@@ -749,7 +776,7 @@ os.remove(path+'/bert_test_output.csv')
 
 CM = confusion_matrix(A, P)
 CM = CM / len (P)
-CM = pd.DataFrame(CM, index=['Brand', 'Female','Male'], columns=['Female','Male'])
+CM = pd.DataFrame(CM, index=['Brand', 'Female','Male'], columns=['Brand', 'Female','Male'])
 plt.figure(figsize = (3,3))
 sns.heatmap(CM, annot=True)
 plt.xlabel("Predicted Values", fontsize = 11)
