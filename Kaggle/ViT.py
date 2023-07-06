@@ -217,33 +217,24 @@ def TransformerModel (model, dataloader, device):
   return out, targets, A, P
 
 train_concat, train_labels, A1, P1 = TransformerModel (imgModel, train_loader, device)
-test_concat, test_labels, A2, P2 = TransformerModel (imgModel, test_loader, device)
 val_concat, test_labels, A2, P2 = TransformerModel (imgModel, val_loader, device)
+test_concat, test_labels, A3, P3 = TransformerModel (imgModel, test_loader, device)
 
 d0 = [x[0] for sub in train_concat for x in sub]
 d1 = [x[1] for sub in train_concat for x in sub]
 d2 = [x[2] for sub in train_concat for x in sub]
-d3 = [x for x in train_labels for q in range(0, 10)] # Batch Size was 10
+d3 = [x for x in train_labels for q in range(0, 8)] # Batch Size was 8
 df = pd.DataFrame(data={'data0':d0, 'data1':d1, 'data2':d2, 'labels':A1})
 df.to_csv ('ViT_Kaggle_train_final.csv', index=False, encoding='utf-8')
 d0 = [x[0] for sub in val_concat for x in sub]
 d1 = [x[1] for sub in val_concat for x in sub]
 d2 = [x[2] for sub in val_concat for x in sub]
-d3 = [x for x in val_labels for q in range(0, 10)] # Batch Size was 10
+d3 = [x for x in val_labels for q in range(0, 8)] # Batch Size was 8
 df1 = pd.DataFrame(data={'data0':d0, 'data1':d1, 'data2':d2, 'labels':A2})
 df1.to_csv ('ViT_Kaggle_val_final.csv', index=False, encoding='utf-8')
 d0 = [x[0] for sub in test_concat for x in sub]
 d1 = [x[1] for sub in test_concat for x in sub]
 d2 = [x[2] for sub in test_concat for x in sub]
-d3 = [x for x in test_labels for q in range(0, 10)] # Batch Size was 10
-df1 = pd.DataFrame(data={'data0':d0, 'data1':d1, 'data2':d2, 'labels':A2})
-df1.to_csv ('ViT_Kaggle_test_final.csv', index=False, encoding='utf-8')
-
-
-
-
-
-
-
-
-
+d3 = [x for x in test_labels for q in range(0, 8)] # Batch Size was 8
+df2 = pd.DataFrame(data={'data0':d0, 'data1':d1, 'data2':d2, 'labels':A3})
+df2.to_csv ('ViT_Kaggle_test_final.csv', index=False, encoding='utf-8')
