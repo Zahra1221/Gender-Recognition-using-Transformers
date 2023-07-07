@@ -147,7 +147,7 @@ for epoch in range (epochs):
     best_accuracy = val_acc
 
 #loading the model
-imgModel = ImageClassifier (swin)
+imgModel = Combination (dropout= 0.5, hidden= 5)
 imgModel = imgModel.to (device)
 imgModel.load_state_dict(torch.load('Swin-BERT'))
 
