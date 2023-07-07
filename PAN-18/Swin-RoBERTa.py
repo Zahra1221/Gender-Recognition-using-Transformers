@@ -120,9 +120,9 @@ def eval_model (model, dataloader, ce_loss, device, entry_size, best_acc):
       M_incorrect += torch.sum ((preds == 1) & (preds != targets))
   return correct_predictions_count.double() / entry_size, np.mean(losses), F_correct / (F_correct + F_incorrect), M_correct / (M_correct + M_incorrect), F_correct / (F_correct + M_incorrect), M_correct / (M_correct + F_incorrect)
 
-train_loader = DataLoader (train_ds, batch_size=8, num_workers=2, shuffle=True)
-val_loader = DataLoader (val_ds, batch_size=8, num_workers=2, shuffle=False)
-test_loader = DataLoader (test_ds, batch_size=8, num_workers=2, shuffle=False)
+train_loader = DataLoader (train_ds, batch_size=16, num_workers=2, shuffle=True)
+val_loader = DataLoader (val_ds, batch_size=16, num_workers=2, shuffle=False)
+test_loader = DataLoader (test_ds, batch_size=16, num_workers=2, shuffle=False)
 
 model = Combination (dropout= 0.5, hidden= 5)
 model = model.to (device)
@@ -147,7 +147,7 @@ for epoch in range (epochs):
     best_accuracy = val_acc
 
 #loading the model
-imgModel = ImageClassifier (swin)
+imgModel = Combination (dropout= 0.5, hidden= 5)
 imgModel = imgModel.to (device)
 imgModel.load_state_dict(torch.load('Swin-RoBERTa'))
 
