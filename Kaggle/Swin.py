@@ -138,16 +138,8 @@ for epoch in range (epochs):
   print()
   history['train_acc'].append(train_acc)
   history['train_loss'].append(train_loss)
-  history['train_F_Percision'].append (train_F_Percision)
-  history['train_M_Percision'].append (train_M_Percision)
-  history['train_F_Recall'].append (train_F_Recall)
-  history['train_M_Recall'].append (train_M_Recall)
   history['val_acc'].append(val_acc)
   history['val_loss'].append(val_loss)
-  history['val_F_Percision'].append (val_F_Percision)
-  history['val_M_Percision'].append (val_M_Percision)
-  history['val_F_Recall'].append (val_F_Recall)
-  history['val_M_Recall'].append (val_M_Recall)
   if val_acc > best_accuracy:
     torch.save(imgModel.state_dict(), 'SwinModel1')
     best_accuracy = val_acc
