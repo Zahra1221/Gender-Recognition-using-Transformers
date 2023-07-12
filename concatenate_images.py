@@ -6,13 +6,11 @@ import numpy as np
 from PIL import Image as img
 
 # In[]
-#path = os.getcwd()
 path = os.path.abspath(__file__)
 path = os.path.abspath(os.path.join(path, os.pardir))
 parent = os.path.abspath(os.path.join(path, os.pardir))
 trainpath = parent + '\\pan18-author-profiling-training-dataset-2018-02-27'
 testpath = parent + '\\pan18-author-profiling-test-dataset-2018-03-20'
-print(path, parent, trainpath, testpath)
 
 # In[]
 with open(trainpath+'\\en\\en.txt') as f:
