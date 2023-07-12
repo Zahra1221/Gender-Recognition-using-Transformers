@@ -11,10 +11,13 @@ The code for building our model, and producing our result is available in this r
 
 For the PAN-18 dataset, first download the PAN-18 train and test datasets and unzip them. Then download this repository, place it beside this PAN-18 train and test datasets, and unzip it. Execute the "concatenate_images.py" file to produce the combined images. The combined images will automatically appear in two new folders, image_train and image_test. Now you are ready to execute the files in the "PAN-18" folder.
 
-The codes in this repository are dependent to the following libraries:
+To execute the codes in this repository install these two libraries:
 
-    transformers
-    transformers pytorch-lightning
+    pip install -q transformers
+    pip install transformers pytorch-lightning --quiet
+
+The codes are also dependent to the following libraries:
+
     os
     cv2
     PIL
