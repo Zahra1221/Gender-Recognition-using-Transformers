@@ -19,6 +19,8 @@ To execute the codes in this repository install these two packages:
 The codes are also dependent to the following libraries:
 
     os
+    shutil
+    urllib
     cv2
     PIL
     pandas
