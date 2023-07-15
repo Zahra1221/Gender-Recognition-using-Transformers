@@ -8,7 +8,6 @@ from PIL import Image
 import pandas as pd
 import numpy as np
 from PIL import Image as img
-from tqdm import tqdm
 
 # In[]
 
