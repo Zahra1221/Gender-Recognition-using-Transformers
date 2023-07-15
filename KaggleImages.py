@@ -66,7 +66,7 @@ os.mkdir(parent+'\\images')
 
 # In[]
 
-for item in tqdm(train_images.keys()):
+for item in train_images.keys():
     g = ''
     if train_images[item][1] == 'brand':
       g = 'B'
@@ -88,7 +88,7 @@ for item in tqdm(train_images.keys()):
 
 # In[]
 
-for item in tqdm(val_images.keys()):
+for item in val_images.keys():
     g = ''
     if val_images[item][1] == 'brand':
       g = 'B'
@@ -110,7 +110,7 @@ for item in tqdm(val_images.keys()):
   
 # In[]
 
-for item in tqdm(test_images.keys()):
+for item in test_images.keys():
     g = ''
     if test_images[item][1] == 'brand':
       g = 'B'
@@ -133,3 +133,5 @@ for item in tqdm(test_images.keys()):
 # In[]
 
 files = shutil.rmtree (parent + '\\images')
+
+
