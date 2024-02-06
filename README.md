@@ -30,4 +30,4 @@ The code is also available in [this colab notebook](https://colab.research.googl
 
 If you use our code or dataset in your work, please kindly cite our manuscript:
 
-Z Movahedi Nia, A Ahmadi, B Mellado, J Wu, J Orbinski, A Asgary, J Kong, Twitter-based gender recognition using transformers, AIMS, Mathematical Biosciences and Engineering, 2023;20(9):15962-81, doi: [10.3934/mbe.2023711.](https://doi.org/10.3934/mbe.2023711)
+Z Movahedi Nia, A Ahmadi, B Mellado, J Wu, J Orbinski, A Asgary, J Kong, Twitter-based gender recognition using transformers, AIMS, Mathematical Biosciences and Engineering, 2023;20(9):15962-81, doi: [10.3934/mbe.2023711](https://doi.org/10.3934/mbe.2023711)
